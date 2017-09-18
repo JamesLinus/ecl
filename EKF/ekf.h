@@ -126,6 +126,10 @@ public:
 	// return true if the origin is valid
 	bool get_ekf_origin(uint64_t *origin_time, map_projection_reference_s *origin_pos, float *origin_alt);
 
+	// set the ekf WGS-84 origin position (lat/lon in deg*10E7) and height (m)
+	// set the horizontal and vertical 1-sigma accuracies (m)
+	void set_ekf_origin(uint32_t lat, uint32_t lon, float hgt, float eph, float epv);
+
 	// get the 1-sigma horizontal and vertical position uncertainty of the ekf WGS-84 position
 	void get_ekf_gpos_accuracy(float *ekf_eph, float *ekf_epv, bool *dead_reckoning);
 

@@ -880,6 +880,27 @@ bool Ekf::get_ekf_origin(uint64_t *origin_time, map_projection_reference_s *orig
 	return _NED_origin_initialised;
 }
 
+// set the ekf WGS 84 origin position (lat/lon in deg*10E7) and height (m)
+// set the horizontal and vertical 1-sigma accuracies (m)
+void Ekf::set_ekf_origin(uint32_t lat, uint32_t lon, float hgt, float eph, float epv)
+{
+	// set the origin horizontal position
+	double lat_deg = lat / 1.0e7;
+	double lon_deg = lon / 1.0e7;
+	map_projection_init_timestamped(&_pos_ref, lat_deg, lon_deg, _time_last_imu);
+
+	_gps_alt_ref = hgt; // height of the origin above the WGS 84 geoid (m)
+	_gps_origin_eph = eph; // origin horizontal 1-sigma circular accuracy (m)
+	_gps_origin_epv = epv; // origin vertical  1-sigma accuracy (m)
+
+	_NED_origin_initialised = true;
+
+	// set the magnetic declination returned by the geo library using the current GPS position
+	_mag_declination_gps = math::radians(get_mag_declination(lat_deg, lon_deg));
+
+	ECL_INFO("EKF WGS-84 origin set externally");
+}
+
 // return an array containing the output predictor angular, velocity and position tracking
 // error magnitudes (rad), (m/s), (m)
 void Ekf::get_output_tracking_error(float error[3])
